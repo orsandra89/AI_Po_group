@@ -1,0 +1,21 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  ai_detection:
+    build:
+      context: ..
+      dockerfile: ./configuration/Dockerfile
+    volumes:
+      - ../dataset:/app/dataset/
+      - ../visualisations:/app/visualisations
+    environment:
+      - PYTHONPATH=/app
+    command: python /app/leaf_detection_ai/ai_detection.py
+
+# docker-compose up --build ----- build container
+# docker-compose down ----- stop container if need
+# docker-compose up ----- start container which already built
+# docker-compose -f ./configuration/docker-compose.yaml up --build ------ if you want use it from main catalogue
+# docker-compose -f ./configuration/docker-compose.yaml down ------ if you want use it from main catalogue
+# docker-compose -f ./configuration/docker-compose.yaml up ------ if you want use it from main catalogue

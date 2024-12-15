@@ -35,3 +35,20 @@ class Visualization:
         plt.title('Training and Validation Loss')
         plt.savefig(os.path.join(SAVE_DIR, 'training_validation_loss.png'))
         plt.close()
+
+    def visualise_dist_images_per_class(self):
+        # Count the number of images in each class directory
+        class_counts = {cls: len(os.listdir(os.path.join(TRAIN_DIR, cls))) for cls in os.listdir(TRAIN_DIR)}
+
+        # Create a bar plot
+        plt.figure(figsize=(12, 6))
+        plt.bar(class_counts.keys(), class_counts.values())
+
+        # Explicitly set tick labels to ensure alignment
+        plt.xticks(range(len(class_counts)), list(class_counts.keys()), rotation=90)
+        plt.xlabel("Plant Class")
+        plt.ylabel("Number of Images")
+        plt.title("Distribution of Images per Class in Training Dataset")
+        plt.tight_layout()  # Adjust layout to prevent label cutoff
+        plt.savefig(os.path.join(SAVE_DIR, 'distribution_of_images_per_class.png'))
+        plt.close()

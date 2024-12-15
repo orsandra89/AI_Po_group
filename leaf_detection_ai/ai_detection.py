@@ -68,3 +68,41 @@ viz = Visualization(model=model, history=history)
 viz.visualise_accuracy_and_loss()
 viz.visualise_dist_images_per_class()
 viz.visualise_learning_curve()
+
+def model_pretraining_configuration():
+    # Load ResNet50 with pre-trained ImageNet weights
+    base_model = ResNet50(weights='imagenet', include_top=False, input_shape=(224, 224, 3))
+
+    # Freeze the base model layers
+    for layer in base_model.layers:
+        layer.trainable = False
+
+    # Add custom classification layers
+    x = base_model.output
+    x = GlobalAveragePooling2D()(x)
+    x = Dropout(0.5)(x)
+    x = Dense(256, activation='relu')(x)
+    output = Dense(train_generator.num_classes, activation='softmax')(x)
+
+    model = Model(inputs=base_model.input, outputs=output)
+    model.compile(
+        optimizer=Adam(learning_rate=0.0001),
+        loss='categorical_crossentropy',
+        metrics=['accuracy']
+    )
+
+    return model
+
+
+def model_training_configuration():
+    model = model_pretraining_configuration()
+    history = model.fit(
+        train_generator,
+        validation_data=val_generator,
+        epochs=5,
+        callbacks=[checkpoint, reduce_lr, early_stop]
+    )
+    test_loss, test_accuracy = model.evaluate(val_generator)
+    print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_accuracy:.4f}")
+
+    return model, history
